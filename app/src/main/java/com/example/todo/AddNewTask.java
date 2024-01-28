@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +14,20 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.example.todo.Model.ToDoModel;
 import com.example.todo.Utils.DatabaseHandler;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class AddNewTask extends BottomSheetDialogFragment {
@@ -28,7 +37,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
     private EditText newTaskText;
     private Button newTaskSaveButton;
     private DatabaseHandler db;
-
+    FirebaseFirestore dbfire;
     public static AddNewTask newInstance(){
         return new AddNewTask();
     }
@@ -43,6 +52,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.new_task, container, false);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
         return view;
     }
 
@@ -54,7 +64,7 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
         db = new DatabaseHandler(getActivity());
         db.openDatabase();
-
+        dbfire = FirebaseFirestore.getInstance();// Access a Cloud Firestore instance from your Activity
         boolean isUpdate = false;
         final Bundle bundle = getArguments();
         if (bundle != null){
@@ -101,6 +111,14 @@ public class AddNewTask extends BottomSheetDialogFragment {
                     ToDoModel task = new ToDoModel();
                     task.setTask(text);
                     task.setStatus(0);
+                    db.insertTask(task);
+
+                    CollectionReference cities = dbfire.collection("tasks");
+
+                    Map<String, Object> data1 = new HashMap<>();
+                    data1.put("task", text);
+                    data1.put("state", 0);
+                    cities.document("t1").set(data1);
                 }
                 dismiss();
             }
