@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,6 +16,11 @@ import com.example.todo.Adapter.ToDoAdapter;
 import com.example.todo.Model.ToDoModel;
 import com.example.todo.Utils.DatabaseHandler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -31,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
     private List<ToDoModel> taskList;
     private DatabaseHandler db;
 
+    private DatabaseReference mDatabase;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
 
         taskList = new ArrayList<>();
 
+
+
         tasksRecyclerView = findViewById(R.id.tasksRecyclerView);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         tasksAdapter = new ToDoAdapter(db, this);
@@ -58,7 +67,8 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         taskList = db.getAllTasks();
         Collections.reverse(taskList);
         tasksAdapter.setTasks(taskList);
-
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+//        mDatabase.addValueEventListener(postListener);
         fab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -71,6 +81,21 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         TextView textViewDate = findViewById(R.id.text_view_date);
         textViewDate.setText(currentDate);
     }
+//    ValueEventListener postListener = new ValueEventListener() {
+//        @Override
+//        public void onDataChange(DataSnapshot dataSnapshot) {
+//            // Get Post object and use the values to update the UI
+//            ToDoModel task = dataSnapshot.getValue(ToDoModel.class);
+//
+//            System.out.println(task.toString());
+//        }
+//
+//        @Override
+//        public void onCancelled(DatabaseError databaseError) {
+//            // Getting Post failed, log a message
+////            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+//        }
+//    };
 
 
     @Override

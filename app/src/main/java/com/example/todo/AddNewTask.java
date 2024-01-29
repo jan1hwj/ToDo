@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -22,6 +23,8 @@ import com.example.todo.Utils.DatabaseHandler;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -55,13 +58,15 @@ public class AddNewTask extends BottomSheetDialogFragment {
 
         return view;
     }
-
+    // Write a message to the database
+    private DatabaseReference mDatabase;
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         super.onViewCreated(view, savedInstanceState);
         newTaskText = getView().findViewById(R.id.newTaskText);
         newTaskSaveButton = getView().findViewById(R.id.newTaskButton);
 
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         db = new DatabaseHandler(getActivity());
         db.openDatabase();
         dbfire = FirebaseFirestore.getInstance();// Access a Cloud Firestore instance from your Activity
@@ -111,14 +116,13 @@ public class AddNewTask extends BottomSheetDialogFragment {
                     ToDoModel task = new ToDoModel();
                     task.setTask(text);
                     task.setStatus(0);
-                    db.insertTask(task);
+                    long  ID= db.insertTask(task);
+                    task.setId((int) ID);
 
-                    CollectionReference cities = dbfire.collection("tasks");
+                    System.out.println(ID);
 
-                    Map<String, Object> data1 = new HashMap<>();
-                    data1.put("task", text);
-                    data1.put("state", 0);
-                    cities.document("t1").set(data1);
+                    mDatabase.child("tasks").child(""+ID).setValue(task);
+
                 }
                 dismiss();
             }

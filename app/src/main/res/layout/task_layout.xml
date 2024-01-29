@@ -19,9 +19,13 @@
             android:layout_height="wrap_content"
             tool:text="This is an Sample Task"
             android:paddingStart="8dp"
-            android:buttonTint="@android:color/holo_green_dark"
+
+
         />
-    </RelativeLayout>>
+<!--        android:buttonTint="@android:color/holo_green_dark"设置纯色显示，导致覆盖了勾-->
+    </RelativeLayout>
+
+
 
 </androidx.cardview.widget.CardView>
 

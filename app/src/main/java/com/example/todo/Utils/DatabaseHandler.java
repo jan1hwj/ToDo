@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.todo.Model.ToDoModel;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,16 +44,17 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //create tables again
         //onCreate(db);
     }
-
+    private DatabaseReference mDatabase;
     public void  openDatabase(){
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         db = this.getWritableDatabase();
     }
 
-    public void insertTask(ToDoModel task){
+    public long insertTask(ToDoModel task){
         ContentValues cv = new ContentValues();
         cv.put(TASK, task.getTask());
         cv.put(STATUS, 0);
-        db.insert(TODO_TABLE, null, cv);
+        return db.insert(TODO_TABLE, null, cv);
     }
 
     @SuppressLint("Range")
@@ -84,16 +87,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(STATUS, status);
         db.update(TODO_TABLE, cv, ID + "=?", new String[] {String.valueOf(id)});
+
+        mDatabase.child("tasks").child(""+id).child("status").setValue(status);
     }
 
     public void updateTask(int id, String task){
         ContentValues cv = new ContentValues();
         cv.put(TASK, task);
         db.update(TODO_TABLE, cv, ID + "=?", new String[]{String.valueOf(id)});
+        mDatabase.child("tasks").child(""+id).child("task").setValue(task);
     }
 
     public void deleteTask(int id){
         db.delete(TODO_TABLE, ID + "=?", new String[]{String.valueOf(id)});
+        mDatabase.child("tasks").child(""+id).removeValue();
     }
 
 }
