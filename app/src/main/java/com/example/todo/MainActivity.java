@@ -9,13 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.todo.Adapter.ToDoAdapter;
 import com.example.todo.Model.ToDoModel;
 import com.example.todo.Utils.DatabaseHandler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,6 +65,11 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
                 AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
             }
         });
+
+        Calendar calendar = Calendar.getInstance();
+        String currentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
+        TextView textViewDate = findViewById(R.id.text_view_date);
+        textViewDate.setText(currentDate);
     }
 
 
@@ -73,3 +81,5 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
         tasksAdapter.notifyDataSetChanged();
     }
 }
+
+
